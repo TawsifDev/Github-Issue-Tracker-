@@ -1,90 +1,137 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Tailwind css & DaisyUI -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Github Issue Tracker</title>
+
+    <!-- Tailwind CSS & DaisyUI -->
     <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
-    <title>Github Issue Tracker </title>
+    <style>
+        /* Top border colors based on status */
+        .card-open   { border-top: 4px solid #22c55e; } /* green */
+        .card-closed { border-top: 4px solid #a855f7; } /* purple */
+
+        /* Loading spinner center */
+       
+    </style>
 </head>
 
 <body class="bg-base-200 min-h-screen">
-    <!-- Navbar -->
+
+    <!-- ================= Navbar ================= -->
     <div class="navbar bg-base-100 shadow-md px-4">
         <div class="navbar-start">
             <a href="#" class="flex items-center gap-2">
                 <img src="./assets/github-logo.png" alt="Logo" class="w-9 h-9 rounded-full object-cover" />
-                <span class="text-lg font-bold text-base-content">
-                    Github Issues Tracker
-                </span>
+                <span class="text-lg font-bold text-base-content">Github Issues Tracker</span>
             </a>
         </div>
-
-        <!--   Search + Button -->
         <div class="navbar-end gap-2">
-            <input type="text" placeholder="Search..." class="input input-bordered input-sm w-40 sm:w-64" />
-            <button class="btn btn-primary btn-sm">
-                Search
-            </button>
+            <input id="searchInput" type="text" placeholder="Search..."
+                class="input input-bordered input-sm w-40 sm:w-64" />
+            <button id="searchBtn" class="btn btn-primary btn-sm">Search</button>
         </div>
-
     </div>
 
-    <!-- Tab Selection -->
-    <div class="max-w-4xl mx-auto bg-base-100 rounded-2xl shadow-md p-4 sm:p-6">
-        <div role="tablist" class="tabs tabs-boxed w-fit mb-4 font-bold">
-            <a role="tab" class="tab tab-active">All</a>
-            <a role="tab" class="tab">Open</a>
-            <a role="tab" class="tab">Closed</a>
-        </div>
- 
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3
-                border border-base-300 rounded-xl p-4 bg-base-100">
+    <!-- ================= Tab Section ================= -->
+    <div class="max-w-7xl mx-auto bg-base-100 rounded-2xl shadow-md p-4 sm:p-6 mt-6">
 
+        <!-- Tabs -->
+        <div role="tablist" class="tabs tabs-boxed w-fit mb-4 font-bold" id="tabs">
+            <a role="tab" data-status="all"    class="tab tab-active">All</a>
+            <a role="tab" data-status="open"   class="tab">Open</a>
+            <a role="tab" data-status="closed" class="tab">Closed</a>
+        </div>
+
+        <!-- Summary Bar -->
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3
+                    border border-base-300 rounded-xl p-4 bg-base-100 mb-6">
             <div class="flex items-start sm:items-center gap-3">
-                <!-- Icon -->
-                <div class="w-10 h-10 flex items-center justify-center rounded-full
-                    bg-primary/10 text-primary shrink-0">
+                <div class="w-10 h-10 flex items-center justify-center rounded-full bg-primary/10 text-primary shrink-0">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
                     </svg>
                 </div>
-
-                <!-- Count + Text -->
                 <div>
                     <div class="flex items-center gap-2">
-                        <span class="text-lg font-bold text-base-content">... </span>
+                        <span id="issueCount" class="text-lg font-bold text-base-content">0</span>
                         <span class="text-sm font-medium text-base-content">Issues</span>
                     </div>
-                    <p class="text-xs text-base-content/60">
-                        Reported issues in this repository
-                    </p>
+                    <p class="text-xs text-base-content/60">Track and manage your project issues</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-4 text-xs sm:text-sm">
+                <span class="flex items-center gap-1">
+                    <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span> Open
+                </span>
+                <span class="flex items-center gap-1">
+                    <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span> Closed
+                </span>
+            </div>
+        </div>
+
+        <!-- Issue Cards Container -->
+        <div id="loader">
+            <span class="loading loading-spinner loading-lg text-primary"></span>
+        </div>
+
+        <div id="issueGrid"
+            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 hidden">
+            <!-- Cards injected by JS -->
+        </div>
+
+        <p id="noResult" class="text-center text-base-content/60 py-10 hidden">
+            No issues found.
+        </p>
+    </div>
+
+    <!-- ================= Modal ================= -->
+    <dialog id="issueModal" class="modal">
+        <div class="modal-box max-w-lg">
+            <h3 id="modalTitle" class="font-bold text-lg mb-1">Issue title</h3>
+
+            <div class="flex items-center gap-2 mb-3">
+                <span id="modalStatus" class="badge badge-success badge-sm">Open</span>
+                <span class="text-xs text-base-content/60">
+                    Opened by <span id="modalAuthor">author</span> · <span id="modalDate">date</span>
+                </span>
+            </div>
+
+            <div class="flex flex-wrap gap-2 mb-4" id="modalLabels"></div>
+
+            <p id="modalDesc" class="text-sm text-base-content/80 mb-6">
+                Description...
+            </p>
+
+            <div class="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                    <p class="text-base-content/60 mb-1">Assignee:</p>
+                    <p id="modalAssignee" class="font-semibold">—</p>
+                </div>
+                <div>
+                    <p class="text-base-content/60 mb-1">Priority:</p>
+                    <span id="modalPriority" class="badge badge-error badge-sm">HIGH</span>
                 </div>
             </div>
 
-            <!-- Right: Markers -->
-            <div class="flex items-center gap-2">
-                <span class="badge badge-success badge-outline gap-1">
-                    <span class="w-2 h-2 rounded-full bg-success"></span>
-                    Open
-                </span>
-                <!-- Closed marker -->
-                <span class="badge badge-purple badge-outline gap-1">
-                    <span class="w-2 h-2 rounded-full bg-error"></span>
-                    Closed
-                </span>
+            <div class="modal-action">
+                <form method="dialog">
+                    <button class="btn btn-primary btn-sm">Close</button>
+                </form>
             </div>
-
         </div>
-    </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
 
-
-    <!-- Js -->
+     <!-- JS  -->
     <script src="logic.js"></script>
 </body>
 
