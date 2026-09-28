@@ -11,18 +11,14 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
     <style>
-        /* Top border colors based on status */
-        .card-open   { border-top: 4px solid #22c55e; } /* green */
-        .card-closed { border-top: 4px solid #a855f7; } /* purple */
-
-        /* Loading spinner center */
-       
+        .card-open   { border-top: 4px solid #22c55e; } 
+        .card-closed { border-top: 4px solid #a855f7; } 
     </style>
 </head>
 
 <body class="bg-base-200 min-h-screen">
 
-    <!-- ================= Navbar ================= -->
+    <!-- Navbar  -->
     <div class="navbar bg-base-100 shadow-md px-4">
         <div class="navbar-start">
             <a href="#" class="flex items-center gap-2">
@@ -37,17 +33,14 @@
         </div>
     </div>
 
-    <!-- ================= Tab Section ================= -->
+    <!--  Tab Section  -->
     <div class="max-w-7xl mx-auto bg-base-100 rounded-2xl shadow-md p-4 sm:p-6 mt-6">
-
-        <!-- Tabs -->
         <div role="tablist" class="tabs tabs-boxed w-fit mb-4 font-bold" id="tabs">
             <a role="tab" data-status="all"    class="tab tab-active">All</a>
             <a role="tab" data-status="open"   class="tab">Open</a>
             <a role="tab" data-status="closed" class="tab">Closed</a>
         </div>
 
-        <!-- Summary Bar -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3
                     border border-base-300 rounded-xl p-4 bg-base-100 mb-6">
             <div class="flex items-start sm:items-center gap-3">
@@ -91,7 +84,7 @@
         </p>
     </div>
 
-    <!-- ================= Modal ================= -->
+    <!--  Modal  -->
     <dialog id="issueModal" class="modal">
         <div class="modal-box max-w-lg">
             <h3 id="modalTitle" class="font-bold text-lg mb-1">Issue title</h3>

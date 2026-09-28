@@ -1,8 +1,3 @@
-/* ======================
-   MAIN PAGE LOGIC
-====================== */
-
-// ✅ FIXED base URL — matches /api/v1/lab
 const API_BASE = "https://phi-lab-server.vercel.app/api/v1/lab";
 
 // DOM
@@ -30,9 +25,6 @@ let allIssues    = [];
 let activeStatus = "all";
 
 
-/* ======================
-   INIT
-====================== */
 document.addEventListener("DOMContentLoaded", () => {
   if (!issueGrid) return;        // safety: don't run on login page
   fetchIssues();
@@ -41,9 +33,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-/* ======================
-   TABS
-====================== */
 function bindTabs() {
   tabs.forEach(tab => {
     tab.addEventListener("click", () => {
@@ -57,9 +46,6 @@ function bindTabs() {
 }
 
 
-/* ======================
-   SEARCH
-====================== */
 function bindSearch() {
   searchBtn.addEventListener("click", handleSearch);
   searchInput.addEventListener("keypress", e => {
@@ -77,7 +63,6 @@ async function handleSearch() {
 
   showLoader();
   try {
-    // ✅ FIXED endpoint
     const res  = await fetch(`${API_BASE}/issues/search?q=${encodeURIComponent(query)}`);
     const data = await res.json();
 
@@ -90,13 +75,9 @@ async function handleSearch() {
 }
 
 
-/* ======================
-   FETCH ALL ISSUES
-====================== */
 async function fetchIssues() {
   showLoader();
   try {
-    // ✅ FIXED endpoint — /issues (not /issues/issues)
     const res  = await fetch(`${API_BASE}/issues`);
     const data = await res.json();
 
@@ -109,9 +90,6 @@ async function fetchIssues() {
 }
 
 
-/* ======================
-   HELPERS
-====================== */
 function filterByStatus(list, status) {
   if (status === "all") return list;
   return list.filter(i => i.status === status);
@@ -147,9 +125,6 @@ function priorityClass(priority) {
 }
 
 
-/* ======================
-   RENDER CARDS
-====================== */
 function renderIssues(issues) {
   loader.classList.add("hidden");
   noResult.classList.add("hidden");
@@ -220,7 +195,6 @@ function renderIssues(issues) {
   });
 }
 
-// Small icon per label type (matches Figma's 🐛 BUG / ⚠ HELP WANTED)
 function labelIcon(label) {
   const l = (label || "").toLowerCase();
   if (l === "bug")         return "🐛";
@@ -230,9 +204,6 @@ function labelIcon(label) {
 }
 
 
-/* ======================
-   MODAL
-====================== */
 function openModal(issue) {
   modalTitle.textContent    = issue.title;
   modalAuthor.textContent   = issue.author;
